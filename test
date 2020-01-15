@@ -1,0 +1,73 @@
+
+$ErrorActionPreference = "stop"
+Set-PSDebug -Strict
+
+[int]$_formy = 460
+[int]$_formx = 640
+
+
+$xamlString = @' 
+<Window 
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="SVN" Height="460" Width="640">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="300"/>
+            <RowDefinition Height="10"/>
+            <RowDefinition Height="1*"/>
+        </Grid.RowDefinitions>
+                <DockPanel>
+                    <!-- ステータスバー -->
+                    <StatusBar DockPanel.Dock="Bottom">
+                        <Button x:Name="buttonSB1" Content="ButtonSB1"/>
+                        <Label x:Name="label1" Content="進行状況:"/>
+                        <ProgressBar Maximum="100" Value="0" Height="20" Width="100" />
+                    </StatusBar>
+                    <!-- 入力系 -->
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="1*"/>
+                            <RowDefinition Height="1*"/>
+                        </Grid.RowDefinitions>
+                        <Button x:Name="buttonContent" Content="Contentaaaaaa" FontSize="72" />
+                        </Grid>
+                </DockPanel>
+        <ScrollViewer x:Name="scrollView" Margin="0,0,0,0" Grid.Row="2">
+            <TextBlock x:Name="msg" TextWrapping="Wrap" Text="TextBlock"/>
+        </ScrollViewer>
+    </Grid>
+</Window>
+'@
+$xaml = [xml]$xamlString.Replace("PSScriptRoot", $PSScriptRoot)
+try { Add-Type -AssemblyName PresentationCore,PresentationFramework,WindowsBase,System.Windows.Forms,ReachFramework  } 
+catch { throw "Failed to load Windows Presentation Framework assemblies." }
+
+$form = [Windows.Markup.XamlReader]::Load((New-Object System.Xml.XmlNodeReader $xaml))
+# For each name in <xxx x:Name="name">, new variable $name is created and set value  
+$xaml.SelectNodes("//*") | ? {$_.Attributes["x:Name"] -ne $null} | % {
+    New-Variable  -Name $_.Name -Value $form.FindName($_.Name) -Force
+}
+
+
+# Function to add text line to bottom TextBlock
+$msg.Text = ""
+Function println($line) {
+    $msg.Inlines.Add($line + "`n")
+    $scrollView.ScrollToBottom() 
+}
+
+# Function to add Click callback
+Function button_add_Click($button) {
+    $btn = $form.FindName($button.Name)
+    if ($btn.add_Click -ne $null) {
+        $btn.add_Click({println ($this.Content + " Pushed")})
+    }
+}
+
+# Add_Click to all button
+$xaml.SelectNodes("//*") | ? {$_.Name -clike "button*"} | %  {button_add_Click $_}
+
+
+
+$result = $form.ShowDialog()
