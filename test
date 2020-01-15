@@ -29,9 +29,24 @@ $xamlString = @'
                         <Grid.RowDefinitions>
                             <RowDefinition Height="1*"/>
                             <RowDefinition Height="1*"/>
+                            <RowDefinition Height="1*"/>
                         </Grid.RowDefinitions>
-                        <Button x:Name="buttonContent" Content="Contentaaaaaa" FontSize="72" />
-                        </Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="80"/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                            <Label Content="path" Margin="0" VerticalAlignment="Center" HorizontalAlignment="Right"/>
+                            <TextBox x:Name="name" Grid.Column="1" Margin="5,5,5,5" VerticalAlignment="Center"/>
+
+                            <Label Content="rev" Margin="0" VerticalAlignment="Center" HorizontalAlignment="Right" Grid.Row="1"/>
+                            <TextBox x:Name="furigana" Grid.Column="1" Grid.Row="1" Margin="5,5,5,5" VerticalAlignment="Center"/>
+
+                            <Label Content="モード" Margin="0" VerticalAlignment="Center" HorizontalAlignment="Right" Grid.Row="2"/>
+                            <StackPanel x:Name="Mode" VerticalAlignment="Center" Orientation="Horizontal" Grid.Column="1" Grid.Row="2">
+                                <RadioButton x:Name="modeConflict" Content="コンフリクト" Margin="10,0,10,0"/>
+                                <RadioButton x:Name="modeCustom" Content="カスタム"/>
+                            </StackPanel>
+                    </Grid>
                 </DockPanel>
         <ScrollViewer x:Name="scrollView" Margin="0,0,0,0" Grid.Row="2">
             <TextBlock x:Name="msg" TextWrapping="Wrap" Text="TextBlock"/>
